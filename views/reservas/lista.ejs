@@ -1,0 +1,31 @@
+<% if (reservas.length===0) { %>
+    <div class="cabeceraSecundaria">
+        <h1>No hay reservas disponibles para mostrar</h1>
+        <a class="linkBoton" href="reservas/nueva">Agregar reserva</a>
+    </div>
+    <% } else { %>
+        <section>
+            <div class="cabeceraSecundaria">
+                <h1>Reservas en nuestro sistema</h1>
+                <a class="linkBoton" href="reservas/nueva">Agregar reserva</a>
+            </div>
+            <div class="grilla">
+                <% reservas.forEach((reserva)=> {%>
+                    <article>
+                        <p><span><%= reserva.sala %></span></p>
+                        <h2><%= reserva.estudiante %></h2>
+                        <p>
+                            <span>Personas:</span>
+                            <%= reserva.personas %>
+                            <% if(reserva.personas> 1) {%> personas<% } else { %> persona <% }%>
+                        </p>
+                        <p><span>Fecha: </span><%= reserva.fecha %></p>
+                        <p><span>Turno: </span><%= reserva.turno %></p>
+                        <div>
+                            <a href="/reservas/<%= reserva.id %>">Ver reserva</a>
+                        </div>
+                    </article>
+                    <% }) %>
+            </div>
+        </section>
+        <% } %>

@@ -1,0 +1,135 @@
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const morgan = require("morgan");
+const path = require("node:path");
+const { leerJson } = require("./archivos");
+const PORT = 3000;
+const rutaDatos = path.join(__dirname, "..", "datos", "productos.json");
+let numeroDeSolicitud = 0;
+
+function identificarSolicitud(req, res, next) {
+    numeroDeSolicitud += 1;
+    res.locals.solicitudId = `SOL-${String(numeroDeSolicitud).padStart(4, "0")}`;
+    next();
+}
+
+function medirDuracion(req, res, next) {
+    const inicio = process.hrtime.bigint();
+    res.on("finish", () => {
+        const fin = process.hrtime.bigint();
+        const milisegundos = Number(fin - inicio) / 1_000_000;
+        console.log(
+            `[${res.locals.solicitudId}] ${req.method} ${req.originalUrl} ` +
+            `${res.statusCode} ${milisegundos.toFixed(2)} ms`,
+        );
+    });
+    next();
+}
+
+function prepararAreaProductos(req, res, next) {
+    res.locals.seccion = "Productos artesanales";
+    next();
+}
+
+function validarProducto(req, res, next) {
+    const nombre = String(req.body.nombre ?? "").trim();
+    const categoria = String(req.body.categoria ?? "").trim();
+    const descripcion = String(req.body.descripcion ?? "").trim();
+    const precio = Number(req.body.precio);
+    if (!nombre || !categoria || !descripcion || !Number.isFinite(precio) || precio <= 0) {
+        return res.status(400).render("productos/nuevo", {
+            titulo: "Nuevo producto",
+            error: "Completá todos los campos con valores válidos.",
+            valores: req.body,
+        });
+    }
+    req.productoValidado = { nombre, categoria, precio, descripcion };
+    next();
+}
+
+async function main() {
+    const productos = await leerJson(rutaDatos);
+    const app = express();
+    
+    function crearProducto(req, res) {
+        const ultimoId = productos.reduce(
+            (mayorId, producto) => Math.max(mayorId, producto.id),
+            0,
+        );
+        productos.push({ id: ultimoId + 1, ...req.productoValidado });
+        res.redirect("/productos");
+    }
+
+    app.set("view engine", "ejs");
+    app.set("views", path.join(__dirname, "..", "views"));
+    app.set("layout", "layouts/main");
+    app.use(morgan("dev"));
+    app.use(identificarSolicitud);
+    app.use(medirDuracion);
+    app.use(expressLayouts);
+    app.use(express.static(path.join(__dirname, "..", "public")));
+    app.use(express.urlencoded({ extended: false }));
+    app.use(express.json());
+    
+    app.get("/", (req, res) => {
+        res.render("inicio", { titulo: "Mercado artesanal" });
+    });
+    
+    app.get("/api/productos", (req, res) => {
+        res.json(productos);
+    });
+    
+    const productosRouter = express.Router();
+    productosRouter.use(prepararAreaProductos);
+    
+    productosRouter.get("/", (req, res) => {
+        res.render("productos/lista", {
+            titulo: "Productos artesanales",
+            productos,
+        });
+    });
+
+    productosRouter.get("/nuevo", (req, res) => {
+        res.render("productos/nuevo", {
+            titulo: "Nuevo producto",
+            error: null,
+            valores: {},
+        });
+    });
+
+    productosRouter.get("/:id", (req, res) => {
+        const id = Number(req.params.id);
+        const producto = productos.find((elemento) => elemento.id === id);
+        if (!producto) {
+            return res.status(404).render("no-encontrado", {
+                titulo: "Producto no encontrado",
+                mensaje: "No existe un producto con ese identificador.",
+            });
+        }
+        res.render("productos/detalle", {
+            titulo: producto.nombre,
+            producto,
+        });
+    });
+    
+    productosRouter.post("/", validarProducto, crearProducto);
+    
+    app.use("/productos", productosRouter);
+    
+    app.use((req, res) => {
+        res.status(404).render("no-encontrado", {
+            titulo: "Página no encontrada",
+            mensaje: "La dirección solicitada no existe.",
+        });
+    });
+    
+    app.listen(PORT, () => {
+        console.log(`Aplicación disponible en http://localhost:${PORT}`);
+    });
+}
+
+
+main().catch((error) => {
+    console.error("No se pudo iniciar la aplicación:", error);
+    process.exitCode = 1;
+});

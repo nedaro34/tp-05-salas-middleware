@@ -1,0 +1,207 @@
+body {
+    margin: 0;
+    background-color: rgb(245, 245, 245);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/*Estilos de cabecera*/
+
+header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #0070FF;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+header a {
+    color: #FAFAFA;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+header>a {
+    display: inline-flex;
+    align-items: center;
+    height: 3rem;
+}
+
+header>a>span {
+    font-size: 2rem;
+    margin-left: 0.5rem;
+}
+
+header nav {
+    display: inline-flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 25rem;
+    height: 3rem;
+}
+
+header nav a {
+    display: inline-block;
+}
+
+/*Estilos de main*/
+
+main {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+    min-width: 320px;
+    width: 80%;
+    min-height: 70vh;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.cabeceraSecundaria {
+    display: flex;
+    justify-content: space-between;
+    height: fit-content;
+    width: 100%;
+}
+
+.cabeceraSecundaria a,
+article a,
+button {
+    display: inline-block;
+    background-color: #0070FF;
+    padding: 1rem;
+    text-decoration: none;
+    color: #FAFAFA;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.cabeceraSecundaria a:hover,
+article a:hover,
+button:hover {
+    background-color: #1700FF;
+}
+
+.cabeceraSecundaria h1 {
+    margin: 0;
+}
+
+.grilla {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.grilla article {
+    padding: 1rem;
+    background-color: #FAFAFA;
+    border-radius: 20px;
+    height: fit-content;
+    box-shadow: 0 0 10px 0 #000000;
+}
+
+@media (max-width: 768px) {
+    .grilla article {
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1280px) {
+    .grilla article {
+        width: 40%;
+
+    }
+}
+
+@media (min-width: 1281px) {
+    .grilla article {
+        width: 25rem;
+    }
+}
+
+article {
+    padding: 2rem;
+    background-color: #FAFAFA;
+    min-width: 10rem;
+    width: 25rem;
+    border-radius: 20px;
+    height: fit-content;
+    box-shadow: 0 0 10px 0 #000000;
+}
+
+.formulario{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    font-weight: bold;
+}
+
+.formulario label{
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+input, select{
+    height: 2rem;
+}
+
+input, select, textarea{
+    font-size: 1rem;
+}
+
+button{
+    margin-top: 1.5rem;
+    border: none;
+}
+.error{
+    color: white;
+    font-weight: bold;
+    background-color: #ff0000;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+    text-align: center;
+}
+
+article h1,
+article h2 {
+    font-size: 2.5rem;
+    color: #FF6300;
+    margin: 0;
+}
+
+article div {
+    display: flex;
+    align-items: end;
+}
+
+article a {
+    margin-left: auto;
+    margin-right: 0%;
+}
+
+article span {
+    font-weight: bold;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    background-color: #0070FF;
+    height: 5rem;
+}
+
+footer p {
+    display: inline-block;
+    align-content: center;
+    color: #FAFAFA;
+    font-weight: bold;
+}

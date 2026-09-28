@@ -1,0 +1,16 @@
+<article>
+    <p><span><%= reserva.sala %></span></p>
+    <h1><%= reserva.estudiante %></h1>
+    <p>
+        <span>Personas:</span>
+        <%= reserva.personas %>
+            <% if(reserva.personas> 1) {%> personas<% } else { %> persona<% }%>
+    </p>
+    <p><span>Fecha: </span><%= reserva.fecha %></p>
+    <p><span>Turno: </span><%= reserva.turno %></p>
+    <p><span>Email: </span><%= reserva.email %></p>
+    <p><span>ID: </span><%= reserva.id %></p>
+    <div>
+        <a href="/reservas">Volver al listado</a>
+    </div>
+</article>

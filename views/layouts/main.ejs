@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= titulo %></title>
+    <link rel="stylesheet" href="/css/estilos.css">
+</head>
+<body>
+    <header>
+        <a href="/">
+            <span>Reservas en sala</span>
+        </a>
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/reservas">Ver reservas</a>
+            <a href="/reservas/nueva"> Generar reservas</a>
+        </nav>
+    </header>
+    <main>
+        <%- body %>
+    </main>
+    <footer>
+        <p>&copy; 2026 Mascotas Alegres. Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>

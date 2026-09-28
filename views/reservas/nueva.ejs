@@ -1,0 +1,41 @@
+<article class="panel-formulario">
+    <h1>
+        <%= titulo %>
+    </h1>
+    <% if (error) { %>
+        <p class="error" role="alert">
+            <%= error %>
+        </p>
+    <% } %>
+    <form action="/reservas" method="post" class="formulario">
+        <label for="estudiante">Estudiante</label>
+        <input id="estudiante" name="estudiante" value="<%= valores.estudiante ?? '' %>" required>
+        
+        <label for="email">Email</label>
+        <input id="email" name="email" value="<%= valores.email ?? '' %>" required>
+        
+        <label for="personas">Personas</label>
+        <input id="personas" name="personas" type="number" min="1" step="1" max="6" value="<%= valores.personas ?? '' %>" required>
+        
+        <label for="sala">Sala</label>
+        <select name="sala" id="sala" required>
+            <option>--------</option>
+            <option value="Sala Norte"><% valores.sala === "Sala Norte" ? "selected" : "" %>Sala Norte</option>
+            <option value="Sala Sur"><% valores.sala === "Sala Sur" ? "selected" : "" %>Sala Sur</option>
+            <option value="Sala Multimedia"><% valores.sala === "Sala Multimedia" ? "selected" : "" %>Sala Multimedia</option>
+        </select>
+
+        <label for="turno">Turno</label>
+        <select name="turno" id="turno" required>
+            <option>--------</option>
+            <option value="Mañana"><% valores.turno === "Mañana" ? "selected" : "" %>Mañana</option>
+            <option value="Tarde"><% valores.turno === "Tarde" ? "selected" : "" %>Tarde</option>
+            <option value="Noche"><% valores.turno === "Noche" ? "selected" : "" %>Noche</option>
+        </select>
+        
+        <label for="fecha">Fecha</label>
+        <input type="date" name="fecha" id="fecha" value="<%= valores.fecha %>">
+        
+        <button type="submit">Guardar reserva</button>
+    </form>
+</article>
