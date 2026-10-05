@@ -20,17 +20,17 @@
         <label for="sala">Sala</label>
         <select name="sala" id="sala" required>
             <option>--------</option>
-            <option value="Sala Norte"><% valores.sala === "Sala Norte" ? "selected" : "" %>Sala Norte</option>
-            <option value="Sala Sur"><% valores.sala === "Sala Sur" ? "selected" : "" %>Sala Sur</option>
-            <option value="Sala Multimedia"><% valores.sala === "Sala Multimedia" ? "selected" : "" %>Sala Multimedia</option>
+            <option value="Sala Norte" <%= valores.sala === "Sala Norte" ? "selected" : "" %>>Sala Norte</option>
+            <option value="Sala Sur" <%= valores.sala === "Sala Sur" ? "selected" : "" %>>Sala Sur</option>
+            <option value="Sala Multimedia" <%= valores.sala === "Sala Multimedia" ? "selected" : "" %>>Sala Multimedia</option>
         </select>
 
         <label for="turno">Turno</label>
         <select name="turno" id="turno" required>
             <option>--------</option>
-            <option value="Mañana"><% valores.turno === "Mañana" ? "selected" : "" %>Mañana</option>
-            <option value="Tarde"><% valores.turno === "Tarde" ? "selected" : "" %>Tarde</option>
-            <option value="Noche"><% valores.turno === "Noche" ? "selected" : "" %>Noche</option>
+            <option value="Mañana" <%= valores.turno === "Mañana" ? "selected" : "" %>>Mañana</option>
+            <option value="Tarde" <%= valores.turno === "Tarde" ? "selected" : "" %>>Tarde</option>
+            <option value="Noche" <%= valores.turno === "Noche" ? "selected" : "" %>>Noche</option>
         </select>
         
         <label for="fecha">Fecha</label>
