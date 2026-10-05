@@ -84,6 +84,7 @@ function validarReserva(request, response, next) {
 
     if (!estudiante ||
         !email ||
+        !email.includes("@") ||
         !salasPermitidas.includes(sala) ||
         !fecha ||
         !turnosPermitidos.includes(turno) ||
