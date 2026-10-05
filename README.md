@@ -1,17 +1,28 @@
 # Trabajo práctico 05
 
-## Aclaración
-
-Este archivo README.md fue generado completamente con IA para lograr cumplir el plazo de entrega. Será revisado, corregido y detallado según lo solicitado en el trabajo práctico.
-
 ## Descripción
 
-Aplicación web desarrollada con **Node.js, Express y EJS** para consultar salas de estudio y reservar temporalmente un turno.
+Este proyecto es el quinto trabajo práctico solicitado en el módulo 3 de la Diplomatura en Desarrollo Web Full Stack con Javascript dictada por el Nodo Tecnológico de Catamarca.
 
-El objetivo principal es aplicar un **pipeline de middleware en Express**, utilizando middleware incorporado, de terceros y personalizado para registrar, identificar, medir, preparar y validar solicitudes antes de ejecutar los handlers finales. El trabajo requiere Morgan, parsers, recursos estáticos, middleware global, middleware de router, validación del POST, un `express.Router()` montado bajo `/reservas`, respuestas 400, una página 404 final y datos únicamente en memoria. 
+Este README.md fue realizado parcialmente con IA para acortar tiempos, por lo que puede contener algo de inconsistencias o ambigüedad en la redacción.
+
+Aquellos apartados que fueron solicitados que se expliquen con palabras propias, fueron redactados manualmente usando conocimiento propio.
+
+Esta aplicación web fue desarrollada con **Node.js, Express y EJS** para consultar salas de estudio y reservar temporalmente un turno.
+
+Fue desarrollada con el fin de aplicar un **pipeline de middleware en Express**, utilizando middleware incorporado, de terceros y personalizado para registrar, identificar, medir, preparar y validar solicitudes antes de ejecutar los handlers finales. El trabajo requiere Morgan, parsers, recursos estáticos, middleware global, middleware de router, validación del POST, un `express.Router()` montado bajo `/reservas`, respuestas 400, una página 404 final y datos únicamente en memoria. 
 
 ## Instalación
 
+Clonar el repositorio y acceder a la carpeta del proyecto:
+
+
+```bash
+git clone https://github.com/nedaro34/tp-05-salas-middleware
+cd tp-05-salas-middleware
+```
+
+Instala las dependencias con:
 ```bash
 npm install
 ```
@@ -23,30 +34,22 @@ Dependencias:
 - `express-ejs-layouts`
 - `morgan`
 
-El proyecto utiliza CommonJS:
-
-```json
-{
-  "type": "commonjs",
-  "scripts": {
-    "start": "node src/index.js",
-    "check": "node --check src/index.js"
-  }
-}
-```
-
-`node_modules` y `.env` deben quedar excluidos mediante `.gitignore`.
 
 ## Ejecución
 
+Para iniciar la aplicación ejecuta:
 ```bash
 npm start
 ```
 
 Para comprobar la sintaxis:
-
 ```bash
 npm run check
+```
+
+Para mantener el servidor activo mientras realizas cambios:
+```bash
+npm run watch
 ```
 
 ## Rutas
@@ -60,16 +63,11 @@ npm run check
 | GET | `/reservas/:id` | Detalle de una reserva |
 | POST | `/reservas` | Validación y creación |
 
-`/reservas/nueva` se declara antes de `/reservas/:id`.
-
 ### Inicio
-
 Explica el propósito del sitio e incluye enlaces al listado y al formulario.
 
 ### Estado
-
-Responde JSON con el servicio, cantidad de reservas e identificador de solicitud:
-
+Responde JSON con el servicio, cantidad de reservas e identificador de solicitud. Por ejemplo:
 ```json
 {
   "servicio": "activo",
@@ -79,26 +77,22 @@ Responde JSON con el servicio, cantidad de reservas e identificador de solicitud
 ```
 
 ### Listado
-
-Muestra todas las reservas, un mensaje alternativo si la colección está vacía y enlaces al detalle y al formulario.
+Muestra todas las reservas, un mensaje alternativo si la colección está vacía, contiene enlaces a los detalles de cada reserva y al formulario para crear reservas nuevas.
 
 ### Detalle
-
-Busca por `id`, muestra todos los datos y responde `404` con HTML cuando la reserva no existe.
+Busca por `id`, muestra todos los datos de la reserva con ese identificador y responde con una página `404` cuando la reserva no existe.
 
 ### Formulario
-
-Incluye controles etiquetados para estudiante, email, sala, fecha, turno y cantidad de personas. Cada control posee `id` y `name`.
+Incluye campos para crear una reserva nueva: estudiante, email, sala, fecha, turno y cantidad de personas. Cada campo esta etiquetado y posee `id` y `name`.
 
 ### POST
-
 El POST utiliza un middleware de validación y un handler final diferente:
 
 ```js
 reservasRouter.post("/", validarReserva, crearReserva);
 ```
 
-El validador responde `400` o prepara los datos y llama a `next()`. El handler agrega la reserva en memoria y redirige a `/reservas`.
+El validador responde `400` al recibir datos inválidos o prepara los datos y llama a `next()`. El handler agrega la reserva en memoria y redirige a `/reservas`.
 
 ## Pipeline de middleware
 
@@ -126,42 +120,66 @@ router de reservas
 página 404
 ```
 
-El orden se justifica porque cada middleware debe disponer de la información preparada por los anteriores. Los parsers deben ejecutarse antes de la validación para que `req.body` exista cuando se ejecute `validarReserva`.
-
 ### Diagrama de POST válido
 
 ```text
 POST /reservas
-      ↓ morgan("dev")
-      ↓ identificarSolicitud
-      ↓ medirDuracion
-      ↓ expressLayouts
-      ↓ express.urlencoded
-      ↓ reservasRouter
-      ↓ prepararAreaReservas
-      ↓ validarReserva
-      ↓ crearReserva
-      ↓ 302 /reservas
-      ↓ finish: ID + estado + duración
+
+morgan("dev")
+   ↓
+identificarSolicitud
+   ↓
+medirDuracion
+   ↓
+expressLayouts
+   ↓
+express.static
+   ↓
+express.urlencoded
+   ↓
+reservasRouter
+   ↓
+prepararReservas
+   ↓
+validarReserva
+   ↓
+crearReserva
+   ↓
+302 /reservas
+   ↓
+finish: id + estado + duración
 ```
 
 ### Diagrama de POST inválido
 
 ```text
 POST /reservas
-      ↓ morgan("dev")
-      ↓ identificarSolicitud
-      ↓ medirDuracion
-      ↓ express.urlencoded
-      ↓ reservasRouter
-      ↓ prepararAreaReservas
-      ↓ validarReserva
-      ↓ 400
-      ↓ render del formulario
-      ↓ fin del ciclo
+
+morgan("dev")
+   ↓
+identificarSolicitud
+   ↓
+medirDuracion
+   ↓
+expressLayouts
+   ↓
+express.static
+   ↓
+express.urlencoded
+   ↓
+reservasRouter
+   ↓
+prepararReservas
+   ↓
+validarReserva
+   ↓
+400 /reservas/nueva
+   ↓
+fin del ciclo
 ```
 
-El POST inválido termina en `validarReserva`; `crearReserva` no se ejecuta.
+El ciclo de POST inválido se repetirá indefinidamente mientras continúe ingresando datos inválidos. La última función ejecutada es `validarReserva()`.
+
 
 ## Alcance de cada función
 
@@ -181,7 +199,7 @@ Middleware personalizado global que genera IDs consecutivos como `BIB-0001`, `BI
 
 ### `medirDuracion`
 
-Middleware personalizado global que guarda el tiempo inicial, registra un listener `finish` sobre `res`, ejecuta `next()` y, al finalizar la respuesta, calcula e imprime ID, método, `req.originalUrl`, `res.statusCode` y duración. La medición se realiza después de finalizar la respuesta.
+Middleware personalizado global que guarda el tiempo inicial, registra un listener `finish` sobre `response`, ejecuta `next()` y, al finalizar la respuesta, calcula e imprime ID, método, `request.originalUrl`, `response.statusCode` y duración. La medición se realiza después de finalizar la respuesta.
 
 ### `express.static`
 
@@ -189,7 +207,7 @@ Middleware incorporado de Express que sirve los recursos estáticos ubicados en 
 
 ### `express.urlencoded`
 
-Parser incorporado que procesa los datos enviados mediante formularios y los hace disponibles mediante `req.body`.
+Parser incorporado que procesa los datos enviados mediante formularios y los hace disponibles mediante `request.body`.
 
 ### `express.json`
 
@@ -201,7 +219,7 @@ Se crea y monta así:
 
 ```js
 const reservasRouter = express.Router();
-app.use("/reservas", reservasRouter);
+aplicacion.use("/reservas", reservasRouter);
 ```
 
 Las rutas internas son relativas al montaje: `/`, `/nueva` y `/:id`.
@@ -211,10 +229,8 @@ Las rutas internas son relativas al montaje: `/`, `/nueva` y `/:id`.
 Middleware de router que define:
 
 ```js
-res.locals.seccion = "Reservas de salas";
+res.locals.seccion = "Solicitud de Reservas";
 ```
-
-El listado y el formulario utilizan este valor. `/estado` no depende de él.
 
 ### `validarReserva`
 
@@ -226,47 +242,30 @@ Middleware de ruta que:
 4. Comprueba que la sala sea permitida.
 5. Comprueba que el turno sea permitido.
 6. Comprueba un entero entre 1 y 6.
-7. Comprueba básicamente que el email contenga `@`.
-8. Responde `400` y conserva los valores ante error.
-9. Muestra el error con `role="alert"`.
-10. Prepara `req.reservaValidada` y llama a `next()` si los datos son correctos.
+7. Responde `400` y conserva los valores ante error.
+8. Muestra el error con `role="alert"`.
+9. Prepara `request.reservaValidada` y llama a `next()` si los datos son correctos.
 
 La validación HTML no reemplaza la validación del servidor.
 
 ### `crearReserva`
 
-Handler final que utiliza `req.reservaValidada`, agrega la reserva al arreglo en memoria y redirige a `/reservas`. No repite la validación completa.
+Handler final que utiliza `request.reservaValidada`, agrega la reserva al arreglo en memoria y redirige a `/reservas`. No repite la validación completa.
 
 ### Página 404
 
 Se registra después de todas las rutas y del router:
 
 ```js
-app.use((req, res) => {
-  res.status(404).render("no-encontrado", {
-    titulo: "Página no encontrada",
-    mensaje: "La dirección solicitada no existe.",
-  });
+aplicacion.use((request, response) => {
+    response.status(404).render("no-encontrado", {
+        titulo: "Página no encontrada",
+        mensaje: "La dirección solicitada no existe.",
+    });
 });
 ```
 
 No se llama a `next()` después del render.
-
-## Middleware incorporado, de terceros y personalizado
-
-- **Incorporado:** `express.static`, `express.urlencoded` y `express.json`, proporcionados por Express.
-- **De terceros:** Morgan, instalado como dependencia externa.
-- **Personalizado:** funciones creadas para la aplicación, como `identificarSolicitud`, `medirDuracion`, `prepararAreaReservas` y `validarReserva`.
-
-## Uso de `next()`
-
-`next()` continúa el pipeline hacia el siguiente middleware o handler. En `validarReserva` se llama únicamente cuando los datos son válidos. Si hay un error, se responde `400` y se renderiza el formulario, por lo que el ciclo termina en ese middleware.
-
-## Alcance global, de router y de ruta
-
-- **Global:** afecta las solicitudes que atraviesan el pipeline general. Ej.: Morgan, `identificarSolicitud` y `medirDuracion`.
-- **De router:** se aplica a las rutas de `reservasRouter`. Ej.: `prepararAreaReservas`.
-- **De ruta:** se aplica a una ruta específica. Ej.: `validarReserva` en `POST /reservas`.
 
 ## Validación
 
@@ -276,7 +275,13 @@ Las salas permitidas son:
 const salasPermitidas = ["Sala Norte", "Sala Sur", "Sala Multimedia"];
 ```
 
-Los turnos permitidos son `Mañana`, `Tarde` y `Noche`. La cantidad de personas debe ser un entero entre 1 y 6 y el email debe contener `@`.
+Los turnos permitidos son:
+
+```js
+const turnosPermitidos = ["Mañana", "Tarde", "Noche"];
+```
+
+La cantidad de personas debe ser un entero entre 1 y 6.
 
 El proyecto define al menos cuatro reservas iniciales propias, con `id`, `estudiante`, `email`, `sala`, `fecha`, `turno` y `personas`. Los IDs son únicos y crecientes.
 
@@ -301,67 +306,38 @@ El proyecto define al menos cuatro reservas iniciales propias, con `id`, `estudi
 | URL inexistente | 404 | Middleware final |
 | Reinicio | 200 | Regreso a datos iniciales |
 
-Para cada caso también se revisan Morgan y la línea de medición personalizada.
-
-## POST 302 y GET posterior
-
-Cuando una reserva es válida, `POST /reservas` agrega el registro en memoria y responde con una redirección `302` hacia `/reservas`. Luego el navegador realiza un nuevo `GET /reservas`, que muestra la colección actualizada.
-
 ## Persistencia temporal
 
-Las reservas iniciales se definen en `src/index.js`. Las nuevas reservas se almacenan solamente en memoria y no se escriben en archivos ni en una base de datos.
+Las reservas iniciales se definen en `src/index.js`. Las nuevas reservas se almacenan solamente en memoria y no se escriben en archivos ni en una base de datos. Por eso, al reiniciar el servidor desaparecen las altas realizadas mediante el formulario y vuelven a quedar únicamente las reservas iniciales.
 
-Por eso, al reiniciar el servidor desaparecen las altas realizadas mediante el formulario y vuelven a quedar únicamente las reservas iniciales. Esta persistencia permanente está fuera del alcance del trabajo.
+## Conceptos solicitados
 
-## Estructura del proyecto
+### Diferencias entre middleware incorporado, de terceros y personalizado
+- **Incorporado:** `express.static`, `express.urlencoded` y `express.json`, proporcionados por Express.
+- **De terceros:** Morgan, instalado como dependencia externa.
+- **Personalizado:** funciones creadas para la aplicación, como `identificarSolicitud`, `medirDuracion`, `prepararAreaReservas` y `validarReserva`.
 
-```text
-tp-05-salas-middleware/
-├── public/
-│   └── css/
-│       └── estilos.css
-├── src/
-│   └── index.js
-├── views/
-│   ├── layouts/
-│   │   └── main.ejs
-│   ├── reservas/
-│   │   ├── lista.ejs
-│   │   └── detalle.ejs
-│   ├── nueva.ejs
-│   ├── inicio.ejs
-│   └── no-encontrado.ejs
-├── .gitignore
-├── package.json
-├── package-lock.json
-└── README.md
-```
+La diferencia entre ellos, es que el personalizado es creado por mí, con código realizado a medida según mis necesidades y el diseño de mi arquitectura, teniendo control total sobre el funcionamiento del middleware. En cambio, el middleware de terceros es incorporado como una dependencia externa independiente que ya me brinda un funcionamiento específico que no puedo modificar; y el middleware incorporado funciona de manera similar al middleware de terceros, pero vienen incorporados dentro de un módulo que puede contener uno o más middleware dentro de él.
 
-El router permanece dentro de `src/index.js` en este trabajo práctico.
+### Cuando se utiliza `next()`
+`next()` se utiliza para continuar la ejecución del pipeline hacia el siguiente middleware o handler.
 
-## Fuera de alcance
+### Porqué los parsers aparecen antes de la validación
+Los parsers se ejecutan antes de la validación porque son los encargados de transformar el formato de los datos entrantes al formato admitido por la aplicació´n, mientras que la validación se encarga de comprobar si esos datos ya transformados son correctos.
 
-No se evalúan:
+### Diferencias entre alcance global, de router y de ruta
+- **Global:** afecta las solicitudes que atraviesan el pipeline general. Ej.: Morgan, `identificarSolicitud` y `medirDuracion`.
+- **De router:** se aplica a las rutas de `reservasRouter`. Ej.: `prepararAreaReservas`.
+- **De ruta:** se aplica a una ruta específica. Ej.: `validarReserva` en `POST /reservas`.
 
-- Routers separados en archivos.
-- Controladores o servicios.
-- Middleware centralizado de errores.
-- Autenticación o autorización.
-- Sesiones o cookies.
-- Bases de datos.
-- Escritura de reservas en archivos.
-- Sanitización avanzada.
-- Limitación de solicitudes.
-- Seguridad de producción.
-- Pruebas automatizadas.
+### Motivo del evento finish
+En **response**, cuando se ejecuta el evento **finish**, recién realiza el cálculo del tiempo total que tardó en ejecutarse la respuesta.
 
-## Comprobación final
+### Resultado del montaje del router
+El montaje del router nos permite simplificar el código que define cada parte de la dirección URL, permitiendo que parte del código usado en tareas de procesamiento (como parsers o validaciones) sea convertido en un middleware.
 
-Antes de entregar:
+### Diferencia entre el POST 302 y el GET posterior
+Cuando una reserva es válida, `POST /reservas` agrega el registro en memoria y responde con una redirección `302` hacia `/reservas`. Luego el navegador realiza un nuevo `GET /reservas`, que muestra la colección actualizada.
 
-```bash
-npm run check
-npm start
-```
-
-Además, se debe recorrer el sitio, probar estados 200, 302, 400 y 404, comprobar que no haya respuestas pendientes ni errores de cabeceras, verificar que `req.body` exista antes de validar, revisar el ID y la medición en la terminal, contrastar el README con el pipeline real, reiniciar para comprobar la memoria temporal y verificar `package-lock.json` y la ausencia de `node_modules` en Git.
+### Motivo por el cual las altas desaparecen al reiniciar
+Las altas desaparecen al reiniciar debido a que la aplicación no tiene ningún método de permanencia de datos: todo los datos ingresados mediante el formulario es almacenado en memoria, y dicha memoria es vaciada al reiniciar la aplicación.
