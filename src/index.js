@@ -11,7 +11,7 @@ const reservas = [
         email: "daniel@gmail.com",
         sala: "Sala Norte",
         fecha: "2026-02-20",
-        turno: "mañana",
+        turno: "Mañana",
         personas: 3
     },
     {
@@ -20,7 +20,7 @@ const reservas = [
         email: "oscarcitoEmoxito@live.com",
         sala: "Sala Norte",
         fecha: "2026-02-21",
-        turno: "noche",
+        turno: "Noche",
         personas: 2
     },
     {
@@ -29,7 +29,7 @@ const reservas = [
         email: "el_loco_nahu@outlook.com",
         sala: "Sala Sur",
         fecha: "2026-02-21",
-        turno: "tarde",
+        turno: "Tarde",
         personas: 1
     },
     {
@@ -38,7 +38,7 @@ const reservas = [
         email: "Alechiki22@hotmail.com",
         sala: "Sala Multimedia",
         fecha: "2026-02-21",
-        turno: "tarde",
+        turno: "Tarde",
         personas: 6
     }
 ]
@@ -64,7 +64,7 @@ function medirDuracion(request, response, next) {
     next()
 }
 
-function prepararReservas(require, response, next){
+function prepararReservas(require, response, next) {
     response.locals.seccion = "Solicitud de Reservas";
     console.log("Sección: " + response.locals.seccion);
     next();
@@ -80,25 +80,19 @@ function validarReserva(request, response, next) {
     const personas = Number(request.body.personas?.trim());
 
     const salasPermitidas = ["Sala Norte", "Sala Sur", "Sala Multimedia"];
+    const turnosPermitidos = ["Mañana", "Tarde", "Noche"];
 
-    if (!estudiante || 
-        !email || 
-        !salasPermitidas.includes(sala) || 
-        !fecha || 
-        !turno || 
+    if (!estudiante ||
+        !email ||
+        !salasPermitidas.includes(sala) ||
+        !fecha ||
+        !turnosPermitidos.includes(turno) ||
         personas < 1 || personas > 6) {
-            console.log("estudiante: "+estudiante);
-            console.log("email: "+email);
-            console.log("sala: "+sala);
-            console.log("fecha: "+fecha);
-            console.log("turno: "+turno);
-            console.log("personas: "+personas);
-
-            return response.status(400).render("reservas/nueva", {
-                titulo: "nueva reserva",
-                error: "Revisa los datos ingresados",
-                valores: request.body
-            }
+        return response.status(400).render("reservas/nueva", {
+            titulo: "nueva reserva",
+            error: "Revisa los datos ingresados",
+            valores: request.body
+        }
         )
     }
 
@@ -112,89 +106,99 @@ function crearReserva(request, response) {
         id: nuevoID,
         ...request.reservaValidada
     })
-    //Verificar esta ruta porque creo que la tendré que cambiar
+
     response.redirect("/reservas")
 }
 
 
 const aplicacion = express();
-aplicacion.set("view engine", "ejs");
-aplicacion.set("views", path.join(__dirname, "..", "views"));
-aplicacion.set("layout", "layouts/main");
 
-aplicacion.use(morgan("dev"));
-aplicacion.use(identificarSolicitud);
-aplicacion.use(medirDuracion);
-aplicacion.use(expressLayouts);
-aplicacion.use(express.static(path.join(__dirname, "..", "public")));
-aplicacion.use(express.urlencoded({ extended: false }))
-aplicacion.use(express.json());
+function main() {
+    try {
+        aplicacion.set("view engine", "ejs");
+        aplicacion.set("views", path.join(__dirname, "..", "views"));
+        aplicacion.set("layout", "layouts/main");
 
-//listo
-aplicacion.get("/", (request, response) => {
-    response.status(200).render("inicio", {
-        titulo: "Reservas en sala",
-        descripcion: "Administra las diversas reservas realizadas en nuestras salas"
-    })
-})
+        aplicacion.use(morgan("dev"));
+        aplicacion.use(identificarSolicitud);
+        aplicacion.use(medirDuracion);
+        aplicacion.use(expressLayouts);
+        aplicacion.use(express.static(path.join(__dirname, "..", "public")));
+        aplicacion.use(express.urlencoded({ extended: false }))
+        aplicacion.use(express.json());
 
-//listo
-aplicacion.get("/estado", (request, response) =>{
-    response.status(200).json({
-        servicio: "activo",
-        reservas : reservas.length,
-        solicitudId : response.locals.solicitudId
-    })
-})
+        //listo
+        aplicacion.get("/", (request, response) => {
+            response.status(200).render("inicio", {
+                titulo: "Reservas en sala",
+                descripcion: "Administra las diversas reservas realizadas en nuestras salas"
+            })
+        })
 
-const reservasRouter = express.Router();
-reservasRouter.use(prepararReservas)
+        //listo
+        aplicacion.get("/estado", (request, response) => {
+            response.status(200).json({
+                servicio: "activo",
+                reservas: reservas.length,
+                solicitudId: response.locals.solicitudId
+            })
+        })
 
-reservasRouter.get("/", (request, response) => {
-    response.status(200).render("reservas/lista",{
-        titulo: "Reservas en nuestro sistema",
-        reservas
-    })
-})
+        const reservasRouter = express.Router();
+        reservasRouter.use(prepararReservas)
 
-reservasRouter.get("/nueva", (request, response) => {
-    response.status(200).render("reservas/nueva",{
-        titulo: "Nueva reserva",
-        error: null,
-        valores: {}
-    })
-})
+        reservasRouter.get("/", (request, response) => {
+            response.status(200).render("reservas/lista", {
+                titulo: "Reservas en nuestro sistema",
+                reservas
+            })
+        })
 
-reservasRouter.get("/:id", (request, response) => {
-        const id = Number(request.params.id);
-        const reserva = reservas.find((reserva) => reserva.id === id);
-        
-        if (!reserva) {
-            return response.status(404).render("no-encontrado", {
-                titulo: "Reserva no encontrada",
-                mensaje: "No existe una reseva con ese identificador.",
+        reservasRouter.get("/nueva", (request, response) => {
+            response.status(200).render("reservas/nueva", {
+                titulo: "Nueva reserva",
+                error: null,
+                valores: {}
+            })
+        })
+
+        reservasRouter.get("/:id", (request, response) => {
+            const id = Number(request.params.id);
+            const reserva = reservas.find((reserva) => reserva.id === id);
+
+            if (!reserva) {
+                return response.status(404).render("no-encontrado", {
+                    titulo: "Reserva no encontrada",
+                    mensaje: "No existe una reseva con ese identificador.",
+                });
+            }
+
+            response.render("reservas/detalle", {
+                titulo: reserva.estudiante,
+                reserva,
             });
-        }
-
-        response.render("reservas/detalle", {
-            titulo: reserva.estudiante,
-            reserva,
         });
-    });
 
-reservasRouter.post("/", validarReserva, crearReserva);
-aplicacion.use("/reservas", reservasRouter);
+        reservasRouter.post("/", validarReserva, crearReserva);
+        aplicacion.use("/reservas", reservasRouter);
 
-//verificar funcionamiento
-aplicacion.use((request, response) => {
-    response.status(404).render("no-encontrado", {
-        titulo: "Página no encontrada",
-        mensaje: "La dirección solicitada no existe.",
-    });
-});
+        //verificar funcionamiento
+        aplicacion.use((request, response) => {
+            response.status(404).render("no-encontrado", {
+                titulo: "Página no encontrada",
+                mensaje: "La dirección solicitada no existe.",
+            });
+        });
 
 
-aplicacion.listen(puerto, () => {
-    console.log("Aplicación disponible en http://localhost:" + puerto);
-})
+        aplicacion.listen(puerto, () => {
+            console.log("Aplicación disponible en http://localhost:" + puerto);
+        })
 
+    } catch (error) {
+        console.log(`Hubo un error durante la ejecución del sistema: ${error}`);
+        process.exitCode = 1;
+    }
+}
+
+main();
