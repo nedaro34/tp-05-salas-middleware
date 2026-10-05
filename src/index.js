@@ -65,7 +65,7 @@ function medirDuracion(request, response, next) {
 }
 
 function prepararReservas(require, response, next) {
-    response.locals.seccion = "Solicitud de Reservas";
+    response.locals.seccion = "Reservas de salas";
     console.log("Sección: " + response.locals.seccion);
     next();
 }
